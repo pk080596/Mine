@@ -1,16 +1,20 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.util.*;
 
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Minesweeper {
 
 	private JFrame frame;
 	private JPanel panel;
 	private JLabel label;
-	private JButton button;
 	private ActionListener Mine;
 	private ActionListener NotMine;
 
@@ -30,10 +34,21 @@ public class Minesweeper {
 		panel = new JPanel();
 		panel.setLayout(new GridLayout(10, 10));
 
+		// Generate mines
+		List<Integer> mines = GenerateMines();
+		int iterate = 0;
+
 		// Action if mine is clicked
 		Mine = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(panel, "This is a mine");
+				try {
+					BufferedImage bomb = ImageIO.read(new File("c:\\workspace\\Mine\\src\\mine.png"));
+					JButton button = (JButton) e.getSource();
+					Image scaledBomb = bomb.getScaledInstance(button.getWidth(),button.getHeight(),Image.SCALE_SMOOTH);
+					button.setIcon(new ImageIcon(scaledBomb));
+				} catch (IOException ex) {
+				}
+				JOptionPane.showMessageDialog(panel, "Game Over");
 			}
 		};
 
@@ -44,12 +59,9 @@ public class Minesweeper {
 			}
 		};
 
-		// Generate mines
-		List<Integer> mines = GenerateMines();
-		int iterate = 0;
-
 		// Create buttons
 		for (int i = 0; i < 100; i++) {
+			JButton button;
 			button = new JButton(" ");
 			if (i == mines.get(iterate) && iterate < 10) {
 				button.addActionListener(Mine);
