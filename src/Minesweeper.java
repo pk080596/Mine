@@ -32,6 +32,7 @@ public class Minesweeper {
 	private void setUp() {
 		Map<Integer, JToggleButton> allButtons = new HashMap<Integer, JToggleButton>();
 		Map<Integer, JToggleButton> allMines = new HashMap<Integer, JToggleButton>();
+		Map<JToggleButton, Integer> Buttons = new HashMap<JToggleButton, Integer>();
 
 		frame = new JFrame("MineSweeper");
 		frame.setVisible(true);
@@ -58,13 +59,13 @@ public class Minesweeper {
 					button.setFocusPainted(false);
 				} catch (IOException ex) {
 				}
-				Object[] option = {"Restart?"};
+				Object[] option = { "Restart?" };
 				JPanel gameover = new JPanel();
 				JLabel gg = new JLabel("Game Over");
 				gameover.add(gg);
-				int result = JOptionPane.showOptionDialog(null, gameover, "Game Over", JOptionPane.YES_OPTION, 
+				int result = JOptionPane.showOptionDialog(null, gameover, "Game Over", JOptionPane.YES_OPTION,
 						JOptionPane.PLAIN_MESSAGE, null, option, null);
-				if(result == JOptionPane.YES_OPTION){
+				if (result == JOptionPane.YES_OPTION) {
 					frame.setVisible(false);
 					frame.dispose();
 					Sweep();
@@ -75,21 +76,21 @@ public class Minesweeper {
 		// Action if mine is not clicked
 		NotMine = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Boolean surrounding;
+				int surrounding;
 				List<JToggleButton> surroundingButtons = new LinkedList<JToggleButton>();
 				JToggleButton button = (JToggleButton) e.getSource();
 				button.setFocusPainted(false);
-				for (int i = 0; i < size; i++) {
-					if (button.equals(allButtons.get(i))) {
-						surrounding = isFreeNode(allMines, i);
-						if (surrounding) {
-							surroundingButtons = getSurroundingButtons(allButtons, i);
-						}
-						break;
-					}
+				int index = getButtonIndex(Buttons, button);
+
+				surrounding = countMines(allMines, index);
+				if (surrounding == 0) {
+					surroundingButtons = getSurroundingButtons(allButtons, index, button);
 				}
-				for(JToggleButton toggle : surroundingButtons){
-					toggle.setSelected(true);
+				if (!surroundingButtons.isEmpty()){
+				spreadOut(allMines, Buttons, allButtons, surroundingButtons);
+				}
+				else {
+					button.setText(String.valueOf(surrounding));
 				}
 			}
 		};
@@ -109,6 +110,7 @@ public class Minesweeper {
 			}
 			panel.add(button);
 			allButtons.put(i, button);
+			Buttons.put(button, i);
 		}
 
 		frame.add(panel, BorderLayout.CENTER);
@@ -133,48 +135,98 @@ public class Minesweeper {
 		return mines;
 	}
 
-	private Boolean isFreeNode(Map<Integer, JToggleButton> mines, int mineIndex) {
-		if (mineIndex % 10 == 9 || mineIndex % 10 == 0 || mineIndex < 9 || mineIndex > size - 9) {
-			return false;
-		}
+	private int countMines(Map<Integer, JToggleButton> mines, int mineIndex) {
+		int mine = 0;
 		if (mines.containsKey(mineIndex - 11)) {
-			return false;
+			mine++;
 		}
 		if (mines.containsKey(mineIndex - 10)) {
-			return false;
+			mine++;
 		}
 		if (mines.containsKey(mineIndex - 9)) {
-			return false;
+			mine++;
 		}
 		if (mines.containsKey(mineIndex - 1)) {
-			return false;
+			mine++;
 		}
 		if (mines.containsKey(mineIndex + 1)) {
-			return false;
+			mine++;
 		}
 		if (mines.containsKey(mineIndex + 9)) {
-			return false;
+			mine++;
 		}
 		if (mines.containsKey(mineIndex + 10)) {
-			return false;
+			mine++;
 		}
 		if (mines.containsKey(mineIndex + 11)) {
-			return false;
+			mine++;
 		}
-		return true;
+		return mine;
 	}
 
-	private List<JToggleButton> getSurroundingButtons(Map<Integer, JToggleButton> allButtons, int buttonIndex) {
+	private List<JToggleButton> getSurroundingButtons(Map<Integer, JToggleButton> allButtons, int buttonIndex,
+			JToggleButton button) {
 		List<JToggleButton> surroundingList = new LinkedList<JToggleButton>();
-		surroundingList.add(allButtons.get(buttonIndex - 11));
-		surroundingList.add(allButtons.get(buttonIndex - 10));
-		surroundingList.add(allButtons.get(buttonIndex - 9));
-		surroundingList.add(allButtons.get(buttonIndex - 1));
-		surroundingList.add(allButtons.get(buttonIndex + 1));
-		surroundingList.add(allButtons.get(buttonIndex + 9));
-		surroundingList.add(allButtons.get(buttonIndex + 10));
-		surroundingList.add(allButtons.get(buttonIndex + 11));
+		int horizontal = 0;
+		int vertical = 0;
+
+		if (buttonIndex % 10 == 9) {
+			horizontal = 2;
+		} else if (buttonIndex % 10 == 0) {
+			horizontal = 1;
+		}
+		if (buttonIndex <= 9) {
+			vertical = 1;
+		} else if (buttonIndex >= size - 10) {
+			vertical = 2;
+		}
+		if (!(vertical == 1) && !(horizontal == 1) && !allButtons.get(buttonIndex - 11).isSelected()) {
+			surroundingList.add(allButtons.get(buttonIndex - 11));
+		}
+		if (!(vertical == 1) && !allButtons.get(buttonIndex - 10).isSelected()) {
+			surroundingList.add(allButtons.get(buttonIndex - 10));
+		}
+		if (!(vertical == 1) && !(horizontal == 2) && !allButtons.get(buttonIndex - 9).isSelected()) {
+			surroundingList.add(allButtons.get(buttonIndex - 9));
+		}
+		if (!(horizontal == 1) && !allButtons.get(buttonIndex - 1).isSelected()) {
+			surroundingList.add(allButtons.get(buttonIndex - 1));
+		}
+		if (!(horizontal == 2) && !allButtons.get(buttonIndex + 1).isSelected()) {
+			surroundingList.add(allButtons.get(buttonIndex + 1));
+		}
+		if (!(vertical == 2) && !(horizontal == 1) && !allButtons.get(buttonIndex + 9).isSelected()) {
+			surroundingList.add(allButtons.get(buttonIndex + 9));
+		}
+		if (!(vertical == 2) && !allButtons.get(buttonIndex + 10).isSelected()) {
+			surroundingList.add(allButtons.get(buttonIndex + 10));
+		}
+		if (!(vertical == 2) && !(horizontal == 2) && !allButtons.get(buttonIndex + 11).isSelected()) {
+			surroundingList.add(allButtons.get(buttonIndex + 11));
+		}
 		return surroundingList;
+	}
+
+	private void spreadOut(Map<Integer, JToggleButton> Bomb, Map<JToggleButton, Integer> Buttons,
+			Map<Integer, JToggleButton> allButtons, List<JToggleButton> surroundingButtons) {
+
+		for (JToggleButton toggle : surroundingButtons) {
+			List<JToggleButton> spread = new LinkedList<JToggleButton>();
+			toggle.setSelected(true);
+			int index = getButtonIndex(Buttons, toggle);
+			int mineNumber = countMines(Bomb, index);
+			if (mineNumber == 0) {
+				spread = getSurroundingButtons(allButtons, index, toggle);
+				spreadOut(Bomb, Buttons, allButtons, spread);
+			}
+			else {
+				toggle.setText(String.valueOf(mineNumber));
+			}
+		}
+	}
+
+	private int getButtonIndex(Map<JToggleButton, Integer> Buttons, JToggleButton button) {
+		return Buttons.get(button);
 	}
 
 }
