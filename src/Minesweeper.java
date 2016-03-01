@@ -21,6 +21,7 @@ public class Minesweeper {
 	private ActionListener NotMine;
 	private int size = 100;
 	private int numberOfMines = 10;
+	private int flipped = 0;
 
 	Minesweeper() {
 	}
@@ -76,21 +77,41 @@ public class Minesweeper {
 		// Action if mine is not clicked
 		NotMine = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int surrounding;
-				List<JToggleButton> surroundingButtons = new LinkedList<JToggleButton>();
 				JToggleButton button = (JToggleButton) e.getSource();
-				button.setFocusPainted(false);
-				int index = getButtonIndex(Buttons, button);
 
-				surrounding = countMines(allMines, index);
-				if (surrounding == 0) {
-					surroundingButtons = getSurroundingButtons(allButtons, index, button);
-				}
-				if (!surroundingButtons.isEmpty()){
-				spreadOut(allMines, Buttons, allButtons, surroundingButtons);
-				}
-				else {
-					button.setText(String.valueOf(surrounding));
+				if (!button.isSelected()) {
+					button.setSelected(true);
+				} else {
+					int surrounding;
+					List<JToggleButton> surroundingButtons = new LinkedList<JToggleButton>();
+					int index = getButtonIndex(Buttons, button);
+
+					surrounding = countMines(allMines, index);
+					if (surrounding == 0) {
+						surroundingButtons = getSurroundingButtons(allButtons, index, button);
+					}
+					if (!surroundingButtons.isEmpty()) {
+						spreadOut(allMines, Buttons, allButtons, surroundingButtons);
+					} else {
+						button.setText(String.valueOf(surrounding));
+					}
+					button.setFocusPainted(false);
+					flipped++;
+					System.out.println(flipped);
+					if (flipped == size - numberOfMines) {
+						Object[] option = { "Restart?" };
+						JPanel gameover = new JPanel();
+						JLabel gg = new JLabel("You Won!");
+						gameover.add(gg);
+						int result = JOptionPane.showOptionDialog(null, gameover, "Win", JOptionPane.YES_OPTION,
+								JOptionPane.PLAIN_MESSAGE, null, option, null);
+						if (result == JOptionPane.YES_OPTION) {
+							frame.setVisible(false);
+							frame.dispose();
+							flipped = 0;
+							Sweep();
+						}
+					}
 				}
 			}
 		};
@@ -99,6 +120,7 @@ public class Minesweeper {
 		for (int i = 0; i < size; i++) {
 			JToggleButton button;
 			button = new JToggleButton("");
+
 			if (i == mines.get(iterate) && iterate < numberOfMines) {
 				button.addActionListener(Mine);
 				allMines.put(i, button);
@@ -137,28 +159,42 @@ public class Minesweeper {
 
 	private int countMines(Map<Integer, JToggleButton> mines, int mineIndex) {
 		int mine = 0;
-		if (mines.containsKey(mineIndex - 11)) {
+		int horizontal = 0;
+		int vertical = 0;
+
+		if (mineIndex % 10 == 9) {
+			horizontal = 2;
+		} else if (mineIndex % 10 == 0) {
+			horizontal = 1;
+		}
+		if (mineIndex <= 9) {
+			vertical = 1;
+		} else if (mineIndex >= size - 10) {
+			vertical = 2;
+		}
+
+		if (!(vertical == 1) && !(horizontal == 1) && mines.containsKey(mineIndex - 11)) {
 			mine++;
 		}
-		if (mines.containsKey(mineIndex - 10)) {
+		if (!(vertical == 1) && mines.containsKey(mineIndex - 10)) {
 			mine++;
 		}
-		if (mines.containsKey(mineIndex - 9)) {
+		if (!(vertical == 1) && !(horizontal == 2) && mines.containsKey(mineIndex - 9)) {
 			mine++;
 		}
-		if (mines.containsKey(mineIndex - 1)) {
+		if (!(horizontal == 1) && mines.containsKey(mineIndex - 1)) {
 			mine++;
 		}
-		if (mines.containsKey(mineIndex + 1)) {
+		if (!(horizontal == 2) && mines.containsKey(mineIndex + 1)) {
 			mine++;
 		}
-		if (mines.containsKey(mineIndex + 9)) {
+		if (!(vertical == 2) && !(horizontal == 1) && mines.containsKey(mineIndex + 9)) {
 			mine++;
 		}
-		if (mines.containsKey(mineIndex + 10)) {
+		if (!(vertical == 2) && mines.containsKey(mineIndex + 10)) {
 			mine++;
 		}
-		if (mines.containsKey(mineIndex + 11)) {
+		if (!(vertical == 2) && !(horizontal == 2) && mines.containsKey(mineIndex + 11)) {
 			mine++;
 		}
 		return mine;
@@ -212,16 +248,19 @@ public class Minesweeper {
 
 		for (JToggleButton toggle : surroundingButtons) {
 			List<JToggleButton> spread = new LinkedList<JToggleButton>();
-			toggle.setSelected(true);
-			int index = getButtonIndex(Buttons, toggle);
-			int mineNumber = countMines(Bomb, index);
-			if (mineNumber == 0) {
-				spread = getSurroundingButtons(allButtons, index, toggle);
-				spreadOut(Bomb, Buttons, allButtons, spread);
+			if (!toggle.isSelected()) {
+				toggle.setSelected(true);
+				flipped++;
+				int index = getButtonIndex(Buttons, toggle);
+				int mineNumber = countMines(Bomb, index);
+				if (mineNumber == 0) {
+					spread = getSurroundingButtons(allButtons, index, toggle);
+					spreadOut(Bomb, Buttons, allButtons, spread);
+				} else {
+					toggle.setText(String.valueOf(mineNumber));
+				}
 			}
-			else {
-				toggle.setText(String.valueOf(mineNumber));
-			}
+			toggle.setFocusPainted(false);
 		}
 	}
 
