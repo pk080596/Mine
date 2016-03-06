@@ -50,12 +50,14 @@ public class Button {
 					}
 					Object[] option = { "Restart" };
 					JPanel gameover = new JPanel();
+					JLabel lose = new JLabel("You lose");
+					gameover.add(lose);
 					int result = JOptionPane.showOptionDialog(null, gameover, "Game Over", JOptionPane.YES_OPTION,
 							JOptionPane.PLAIN_MESSAGE, null, option, null);
 					if (result == JOptionPane.YES_OPTION) {
 						frame.setVisible(false);
 						frame.dispose();
-						restart.Sweep();
+						restart.setup();
 					}
 				}
 				button.setFocusPainted(false);
@@ -100,7 +102,7 @@ public class Button {
 							frame.setVisible(false);
 							frame.dispose();
 							flipped = 0;
-							restart.Sweep();
+							restart.setup();
 						}
 					}
 				}

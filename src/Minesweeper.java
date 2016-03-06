@@ -20,23 +20,22 @@ public class Minesweeper {
 	private int numMine;
 
 	Minesweeper() {
-		// constructor
 	}
 
-	public void Sweep() {
-		setUp();
+	public void setup() {
+		initialize();
 	}
 
-	private void setUp() {
+	private void initialize() {
+		initializeGame();
 		frame = new JFrame("MineSweeper");
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		initializeGame();
-		
 		// Set grid structure
 		panel = new JPanel();
 		GridLayout grid = new GridLayout(length, length, 0, 0);
+		panel.setPreferredSize(new Dimension(length * 50, length * 50));
 		panel.setLayout(grid);
 
 		// Generate mines
@@ -44,9 +43,8 @@ public class Minesweeper {
 		Button button = new Button(length, numMine, mines);
 		button.createButton(frame, panel);
 
-		frame.add(panel, BorderLayout.CENTER);
+		frame.getContentPane().add(panel, BorderLayout.CENTER);
 		frame.pack();
-		frame.setSize(length * 50, length * 50 + 50);
 		frame.setResizable(false);
 
 	}
@@ -71,36 +69,47 @@ public class Minesweeper {
 		JLabel label = new JLabel();
 		JTextField text = new JTextField();
 		text.setPreferredSize(new Dimension(130, 20));
-		label.setText("Enter length of minefield (2-20)");
+		label.setText("Enter length of minefield (2-10)");
 		initialize.add(label);
 		initialize.add(text);
-
 		Object[] option = { "Ok" };
-		int ok = JOptionPane.showOptionDialog(null, initialize, "Setup", JOptionPane.YES_OPTION,
-				JOptionPane.PLAIN_MESSAGE, null, option, null);
+		initializeSize(initialize, text, option);
+		
+		JPanel initialize_2 = new JPanel();
+		label.setText("Enter number of mines (1-99)");
+		initialize_2.add(label);
+		initialize_2.add(text);
+		initializeMine(initialize_2, text, option);
+		
+	}
 
-		if (ok == 0) {
-			length = Integer.valueOf(text.getText());
-			if (length <= 20 && length >= 1) {
-				size = length * length;
-				JPanel initialize_2 = new JPanel();
-				label.setText("Enter number of mines (1-99)");
-				initialize_2.add(label);
-				initialize_2.add(text);
-				int ok_2 = JOptionPane.showOptionDialog(null, initialize_2, "Setup", JOptionPane.YES_OPTION,
-						JOptionPane.PLAIN_MESSAGE, null, option, null);
-				if (ok_2 == 0) {
-					int mine = Integer.valueOf(text.getText());
-					if (mine <= 99 && mine >= 1) {
-						numMine = mine;
-					}
-				} else {
-					initializeGame();
-				}
-			} else {
-				initializeGame();
-			}
+
+private void initializeSize(JPanel panel, JTextField textfield, Object[] option){
+	int ok = JOptionPane.showOptionDialog(null, panel, "Setup", JOptionPane.YES_OPTION,
+			JOptionPane.PLAIN_MESSAGE, null, option, null);
+	
+	if (ok == 0) {
+		length = Integer.valueOf(textfield.getText());
+		if (length <= 10 && length > 1) {
+			size = length * length;
+		} else {
+			initializeSize(panel, textfield,option);
 		}
 	}
+}
+
+private void initializeMine(JPanel panel, JTextField textfield, Object[] option){
+	int ok_2 = JOptionPane.showOptionDialog(null, panel, "Setup", JOptionPane.YES_OPTION,
+			JOptionPane.PLAIN_MESSAGE, null, option, null);
+	
+	if (ok_2 == 0) {
+		int mine = Integer.valueOf(textfield.getText());
+		if (mine <= 99 && mine >= 1) {
+			numMine = mine;
+		} else {
+			initializeMine(panel, textfield, option);
+		}
+	}
+}
 
 }
