@@ -73,43 +73,59 @@ public class Minesweeper {
 		initialize.add(label);
 		initialize.add(text);
 		Object[] option = { "Ok" };
+
 		initializeSize(initialize, text, option);
-		
+		if (size == 0) {
+			System.exit(0);
+		}
+
 		JPanel initialize_2 = new JPanel();
 		label.setText("Enter number of mines (1-99)");
 		initialize_2.add(label);
 		initialize_2.add(text);
 		initializeMine(initialize_2, text, option);
-		
+		if (numMine == 0) {
+			System.exit(0);
+		}
+
 	}
 
+	private void initializeSize(JPanel panel, JTextField textfield, Object[] option) {
+		textfield.setText(null);
+		int ok = JOptionPane.showOptionDialog(null, panel, "Setup", JOptionPane.YES_OPTION, JOptionPane.PLAIN_MESSAGE,
+				null, option, null);
 
-private void initializeSize(JPanel panel, JTextField textfield, Object[] option){
-	int ok = JOptionPane.showOptionDialog(null, panel, "Setup", JOptionPane.YES_OPTION,
-			JOptionPane.PLAIN_MESSAGE, null, option, null);
-	
-	if (ok == 0) {
-		length = Integer.valueOf(textfield.getText());
-		if (length <= 10 && length > 1) {
-			size = length * length;
-		} else {
-			initializeSize(panel, textfield,option);
+		if (ok == 0) {
+			if (textfield.getText().isEmpty()) {
+				initializeSize(panel, textfield, option);
+			} else {
+				length = Integer.valueOf(textfield.getText());
+				if (length <= 10 && length > 1) {
+					size = length * length;
+				} else {
+					initializeSize(panel, textfield, option);
+				}
+			}
 		}
 	}
-}
 
-private void initializeMine(JPanel panel, JTextField textfield, Object[] option){
-	int ok_2 = JOptionPane.showOptionDialog(null, panel, "Setup", JOptionPane.YES_OPTION,
-			JOptionPane.PLAIN_MESSAGE, null, option, null);
-	
-	if (ok_2 == 0) {
-		int mine = Integer.valueOf(textfield.getText());
-		if (mine <= 99 && mine >= 1) {
-			numMine = mine;
-		} else {
-			initializeMine(panel, textfield, option);
+	private void initializeMine(JPanel panel, JTextField textfield, Object[] option) {
+		textfield.setText(null);
+		int ok_2 = JOptionPane.showOptionDialog(null, panel, "Setup", JOptionPane.YES_OPTION, JOptionPane.PLAIN_MESSAGE,
+				null, option, null);
+
+		if (ok_2 == 0) {
+			if (textfield.getText().isEmpty()) {
+				initializeMine(panel, textfield, option);
+			} else {
+				int mine = Integer.valueOf(textfield.getText());
+				if (mine <= 99 && mine >= 1) {
+					numMine = mine;
+				} else {
+					initializeMine(panel, textfield, option);
+				}
+			}
 		}
 	}
-}
 
 }
