@@ -183,13 +183,13 @@ public class Button {
 			vertical = 2;
 		}
 
-		if (!(vertical == 1) && !(horizontal == 1) && allMines.containsKey(mineIndex - length + 1)) {
+		if (!(vertical == 1) && !(horizontal == 1) && allMines.containsKey(mineIndex - (length + 1))) {
 			mine++;
 		}
 		if (!(vertical == 1) && allMines.containsKey(mineIndex - length)) {
 			mine++;
 		}
-		if (!(vertical == 1) && !(horizontal == 2) && allMines.containsKey(mineIndex - length - 1)) {
+		if (!(vertical == 1) && !(horizontal == 2) && allMines.containsKey(mineIndex - (length - 1))) {
 			mine++;
 		}
 		if (!(horizontal == 1) && allMines.containsKey(mineIndex - 1)) {
@@ -198,13 +198,13 @@ public class Button {
 		if (!(horizontal == 2) && allMines.containsKey(mineIndex + 1)) {
 			mine++;
 		}
-		if (!(vertical == 2) && !(horizontal == 1) && allMines.containsKey(mineIndex + length - 1)) {
+		if (!(vertical == 2) && !(horizontal == 1) && allMines.containsKey(mineIndex + (length - 1))) {
 			mine++;
 		}
 		if (!(vertical == 2) && allMines.containsKey(mineIndex + length)) {
 			mine++;
 		}
-		if (!(vertical == 2) && !(horizontal == 2) && allMines.containsKey(mineIndex + length + 1)) {
+		if (!(vertical == 2) && !(horizontal == 2) && allMines.containsKey(mineIndex + (length + 1))) {
 			mine++;
 		}
 		return mine;
@@ -227,14 +227,14 @@ public class Button {
 			vertical = 2;
 		}
 
-		JToggleButton button_11N = allButtons.get(buttonIndex - length + 1);
+		JToggleButton button_11N = allButtons.get(buttonIndex - (length + 1));
 		JToggleButton button_10N = allButtons.get(buttonIndex - length);
-		JToggleButton button_9N = allButtons.get(buttonIndex - length - 1);
+		JToggleButton button_9N = allButtons.get(buttonIndex - (length - 1));
 		JToggleButton button_1N = allButtons.get(buttonIndex - 1);
 		JToggleButton button_1 = allButtons.get(buttonIndex + 1);
-		JToggleButton button_9 = allButtons.get(buttonIndex + length - 1);
+		JToggleButton button_9 = allButtons.get(buttonIndex + (length - 1));
 		JToggleButton button_10 = allButtons.get(buttonIndex + length);
-		JToggleButton button_11 = allButtons.get(buttonIndex + length + 1);
+		JToggleButton button_11 = allButtons.get(buttonIndex + (length + 1));
 
 		if (!(vertical == 1) && !(horizontal == 1) && !button_11N.isSelected()) {
 			surroundingList.add(button_11N);
