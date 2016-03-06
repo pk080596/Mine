@@ -23,7 +23,7 @@ public class Button {
 	Map<JToggleButton, Integer> buttons = new HashMap<JToggleButton, Integer>();
 	Map<Button, JToggleButton> buttonIndex = new HashMap<Button, JToggleButton>();
 	Map<JToggleButton, Boolean> buttonStatus = new HashMap<JToggleButton, Boolean>();
-	List<Integer> mines = new LinkedList<Integer>();
+	List<Integer> mines = new ArrayList<Integer>();
 	Minesweeper restart = new Minesweeper();
 
 	public Button(int length, int numMine, List<Integer> mines) {
@@ -75,7 +75,7 @@ public class Button {
 					button.setSelected(true);
 				} else {
 					int surrounding;
-					List<JToggleButton> surroundingButtons = new LinkedList<JToggleButton>();
+					List<JToggleButton> surroundingButtons = new ArrayList<JToggleButton>();
 					int index = getButtonIndex(button);
 
 					surrounding = countMines(button);
@@ -120,7 +120,16 @@ public class Button {
 				public void mouseClicked(MouseEvent e) {
 					if (SwingUtilities.isRightMouseButton(e) && SwingUtilities.isLeftMouseButton(e)
 							&& button.isSelected()) {
+						List<JToggleButton> surround = new ArrayList<JToggleButton>();
+						surround = getSurroundingButtons(allButtons, getButtonIndex(button), button);
+						int numFlag = countFlags(surround);
 						
+						if(numFlag == countMines(button)){
+							for(JToggleButton press : surround){
+								if(!checkFlag(press))
+								press.doClick();
+							}
+						}
 
 					} else if (SwingUtilities.isRightMouseButton(e) && !button.isSelected()) {
 						if (!checkFlag(button)) {
@@ -150,7 +159,6 @@ public class Button {
 				button.addActionListener(NotMine);
 			}
 
-			// Action if mine is clicked
 			button.setFocusPainted(false);
 			panel.add(button);
 			allButtons.put(i, button);
@@ -209,10 +217,20 @@ public class Button {
 		}
 		return mine;
 	}
+	
+	private int countFlags(List<JToggleButton> button){
+		int count = 0;
+		for(JToggleButton flag : button){
+			if(checkFlag(flag)){
+				count++;
+			}
+		}
+		return count;
+	}
 
 	private List<JToggleButton> getSurroundingButtons(Map<Integer, JToggleButton> allButtons, int buttonIndex,
 			JToggleButton button) {
-		List<JToggleButton> surroundingList = new LinkedList<JToggleButton>();
+		List<JToggleButton> surroundingList = new ArrayList<JToggleButton>();
 		int horizontal = 0;
 		int vertical = 0;
 
@@ -266,7 +284,7 @@ public class Button {
 	private void spreadOut(List<JToggleButton> surroundingButtons) {
 
 		for (JToggleButton toggle : surroundingButtons) {
-			List<JToggleButton> spread = new LinkedList<JToggleButton>();
+			List<JToggleButton> spread = new ArrayList<JToggleButton>();
 			if (!toggle.isSelected() && !checkFlag(toggle)) {
 				toggle.setSelected(true);
 				flipped++;
